@@ -6,6 +6,6 @@
     ],
     "devDependencies": {
         "eslint": "^9.22.0",
-        "lerna": "^3.4.3"
+        "lerna": "^8.2.2"
     }
 }
