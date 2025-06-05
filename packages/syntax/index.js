@@ -9,20 +9,25 @@ exports.activate = async context => {
   let source = {
     name: 'syntax',
     triggerCharacters: [],
-    doComplete: async function (opt) {
-      let words = cache[opt.filetype]
+    on_enter: async (opt) => {
+      let filetype = opt.languageId
+      if (!filetype) return
+      let words = cache[filetype]
       if (!words) {
         try {
           words = await nvim.call('syntaxcomplete#OmniSyntaxList')
           // eslint-disable-next-line require-atomic-updates
-          cache[opt.filetype] = words
+          cache[filetype] = words
         } catch (e) {
           outputChannel.append(`Error: ${e.message}`)
           return null
         }
       }
+    },
+    doComplete: async function (opt) {
       let {input} = opt
-      if (!input.length) return null
+      let words = cache.hasOwnProperty(opt.filetype) ? cache[opt.filetype] : null
+      if (!input.length || !words || words.length === 0) return null
       let {firstMatch} = this
       let isUpperCase = input[0] == input[0].toUpperCase()
       if (firstMatch) {
